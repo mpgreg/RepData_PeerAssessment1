@@ -5,7 +5,6 @@ date: "October 15, 2015"
 output: html_document
 ---
 
-
 ```{r setoptions,echo = FALSE}
 library(knitr)
 opts_chunk$set(echo = TRUE
@@ -13,7 +12,6 @@ opts_chunk$set(echo = TRUE
                ##,cache = TRUE)
                )
 ```
-
 
 
 ##Introduction
@@ -38,44 +36,54 @@ if(capabilities("libcurl")) {
 }
 activityDF <- read.csv(unz(tempFile, activityFile))
 unlink(tempFile)
-
 ```
 
 2. Process/transform the data into a format suitable for your analysis
 ```{r preprocessdata}
-##Change data type for "date"" column
+#set the date data type
 activityDF$date <- as.Date(activityDF$date)
-
-##Recode zero values for steps as NA (missing)
-is.na(activityDF$steps) <- !activityDF$steps
-
-
 ```
 
 ##What is mean total number of steps taken per day?
+1. Calculate the total number of steps taken per day (ignoring missing values)
+```{r stepsum}
+sumStepsByDay <- aggregate(steps ~ date, FUN=sum, data=activityDF, na.action = "na.omit")
 
-1. Make a histogram of the total number of steps taken each day (ignoring missing values)
-
-```{r stepshist, fig.height=4}
-stepsXtab <- xtabs(steps ~ date, activityDF)
-hist(stepsXtab, main = "Histogram of Total Steps Taken per Day", xlab = "steps")
 ```
 
-2. Calculate and report the mean and median total number of steps taken per day
+2. Make a histogram of the total number of steps taken each day
 
-```{r showtable, results='asis'}
+```{r stepshist, fig.height=4}
+hist(sumStepsByDay$steps, main = "Histogram of Total Steps Taken per Day (ignoring missing values)", xlab = "steps")
+```
+
+3. Calculate and report the mean and median total number of steps taken per day
+
+```{r showtable}, results='asis'}
 library(xtable)
-meanSteps <- round(mean(as.matrix(stepsXtab)))
-medianSteps <- median(as.matrix(stepsXtab))
-xt <- xtable(matrix(c(meanSteps, medianSteps), nrow = 1, ncol = 2, dimnames = list("",c("Mean ","Median "))))
+meanSteps <- round(mean(sumStepsByDay$steps))
+medianSteps <- round(median(sumStepsByDay$steps))
+xt <- xtable(matrix(c(meanSteps, medianSteps), dimnames = list(c("Mean","Median"),c("Steps"))), digits = 0)
 print(xt, type="html")
 ```
 
 ##What is the average daily activity pattern?
 
 1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+```{r showplot, fig.height=4}
+meanStepsByInterval <- aggregate(steps ~ interval, FUN=mean, data=activityDF, na.action = "na.omit")
+plot(meanStepsByInterval, type="l",
+     main = "Average Steps Taken per 5-min Interval", 
+     ylab = "Averages steps across all days",
+     xlab = "5-min Interval")
+```
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+```{r fiveminmax}
+maxMeanSteps <- meanStepsByInterval[which.max(meanStepsByInterval$steps),]
+```
+
+On average, the 5-minute interval `r maxMeanSteps$interval` contains the most (`r round(maxMeanSteps$steps)`) steps.  
 
 ##Imputing missing values
 
@@ -83,11 +91,50 @@ Note that there are a number of days/intervals where there are missing values (c
 
 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
+```{r}
+totalNAs <- sum(is.na(activityDF))
+```
+
+There are `r totalNAs` rows in the activity dataset containing missing (NA) values.  
+
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+```{r}
+#Create a new column in the dataset with the mean for that 5-minute interval across all days.
+activityDF <- merge(activityDF, meanStepsByInterval, by = "interval")
+colnames(activityDF) <- c("interval", "steps", "date", "dailyMeanSteps")
+```
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
+```{r}
+activityDF[is.na(activityDF$steps),]$steps <- activityDF[is.na(activityDF$steps),]$dailyMeanSteps
+```
+
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+```{r showimputed, fig.height=4, results='asis'}
+imputedSumStepsByDay <- aggregate(steps ~ date, FUN=sum, data=activityDF)
+hist(imputedSumStepsByDay$steps, main = "Histogram of Total Steps Taken per Day (with imputed missing values)", xlab = "steps")
+imputedMeanSteps <- round(mean(imputedSumStepsByDay$steps))
+imputedMedianSteps <- round(median(imputedSumStepsByDay$steps))
+imputedXT <- xtable(matrix(c(imputedMeanSteps, imputedMedianSteps), dimnames = list(c("Imputed Mean","Imputed Median"),c("Steps"))), digits = 0)
+print(imputedXT, type="html")
+```
+```{r provideresults, echo=FALSE}
+if(!meanSteps==imputedMeanSteps) {
+        cat(sprintf("As a result of the imputation the average steps per day changed from %s to %s.\n", meanSteps, imputedMeanSteps))
+} else {
+        cat(sprintf("The average steps per day did not change as a result of the imputation."))
+}
+
+if(!medianSteps==imputedMedianSteps) {
+        cat(sprintf("As a result of the imputation the median steps per day changed from %s to %s.\n", medianSteps, imputedMedianSteps))
+} else {
+        cat(sprintf("The median steps per day did not change as a result of the imputation."))
+}
+```
+
+For this dataset imputaion using daily average did not have a significant impact on analysis.
 
 ##Are there differences in activity patterns between weekdays and weekends?
 
