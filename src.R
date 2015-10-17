@@ -86,11 +86,11 @@ cat(sprintf("There are %s rows in the activity dataset containing missing (NA) v
 #2. Create a new column in the dataset with the mean for that 5-minute interval across all days.
 
 activityDF <- merge(activityDF, meanStepsByInterval, by = "interval")
-colnames(activityDF) <- c("interval", "steps", "date", "dailyMeanSteps")
+colnames(activityDF) <- c("interval", "steps", "date", "Mean.Daily.Steps")
 
 #3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
-activityDF[is.na(activityDF$steps),]$steps <- activityDF[is.na(activityDF$steps),]$dailyMeanSteps
+activityDF[is.na(activityDF$steps),]$steps <- activityDF[is.na(activityDF$steps),]$Mean.Daily.Steps
 
 
 #4. Make a histogram of the total number of steps taken each day and calculate and report the mean and median total number of steps taken per day. 
@@ -117,17 +117,26 @@ if(!medianSteps==imputedMedianSteps) {
 #For this dataset imputing using daily average did not have a significant impact on analysis.
 
 
-
 ##Are there differences in activity patterns between weekdays and weekends?
 
 ##For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
 
 #1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 
-#2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was created using simulated data:
-        
-        
+##weekdayNames <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+weekendNames <- c("Saturday", "Sunday")
+activityDF$Type.of.Day <- as.factor(ifelse(weekdays(activityDF$date) %in% weekendNames,"weekend", "weekday"))
 
+
+#2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
+        
+library(lattice)
+meanStepsByDayType <- aggregate(steps ~ interval + Type.of.Day, FUN=mean, data=activityDF, na.action = "na.omit")
+xyplot(steps ~ interval | Type.of.Day, meanStepsByDayType, 
+       type = "l", 
+       layout = c(1,2), 
+       main = "Mean Steps Taken per Interval by Day Type", 
+       ylab = "Number of Steps (mean)")
 
 
 

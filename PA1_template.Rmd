@@ -1,7 +1,7 @@
 ---
 title: "Reproducible Research - Project 1"
 author: "Michael Gregory"
-date: "October 15, 2015"
+date: "October 17, 2015"
 output: html_document
 ---
 
@@ -21,6 +21,8 @@ This project analyses personal movement using activity monitoring data from an a
 -steps: Number of steps taking in a 5-minute interval (missing values are coded as NA)  
 -date: The date on which the measurement was taken in YYYY-MM-DD format  
 -interval: Identifier for the 5-minute interval in which measurement was taken  
+  
+  
   
 ##Loading and preprocessing the data
 1. Load the data
@@ -43,6 +45,8 @@ unlink(tempFile)
 #set the date data type
 activityDF$date <- as.Date(activityDF$date)
 ```
+
+
 
 ##What is mean total number of steps taken per day?
 1. Calculate the total number of steps taken per day (ignoring missing values)
@@ -67,6 +71,8 @@ xt <- xtable(matrix(c(meanSteps, medianSteps), dimnames = list(c("Mean","Median"
 print(xt, type="html")
 ```
 
+
+
 ##What is the average daily activity pattern?
 
 1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
@@ -84,6 +90,8 @@ maxMeanSteps <- meanStepsByInterval[which.max(meanStepsByInterval$steps),]
 ```
 
 On average, the 5-minute interval `r maxMeanSteps$interval` contains the most (`r round(maxMeanSteps$steps)`) steps.  
+
+
 
 ##Imputing missing values
 
@@ -136,11 +144,26 @@ if(!medianSteps==imputedMedianSteps) {
 
 For this dataset imputaion using daily average did not have a significant impact on analysis.
 
+
+
 ##Are there differences in activity patterns between weekdays and weekends?
 
-For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
-
 1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+```{r}
+weekendNames <- c("Saturday", "Sunday")
+activityDF$Type.of.Day <- as.factor(ifelse(weekdays(activityDF$date) %in% weekendNames,"weekend", "weekday"))
 
-2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was created using simulated data:
+```
+
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
+
+```{r plotbydaytype}
+library(lattice)
+meanStepsByDayType <- aggregate(steps ~ interval + Type.of.Day, FUN=mean, data=activityDF, na.action = "na.omit")
+xyplot(steps ~ interval | Type.of.Day, meanStepsByDayType, 
+       type = "l", 
+       layout = c(1,2), 
+       main = "Mean Steps Taken per Interval by Day Type", 
+       ylab = "Number of Steps (mean)")
+```
 
