@@ -1,11 +1,8 @@
 ---
-title: "Reproducible Research - Project 1"
-author: "Michael Gregory"
-date: "October 17, 2015"
+title: "Reproducible Research: Peer Assessment 1"
 output:
   html_document:
     keep_md: yes
-    self_contained: no
 ---
 
 ```{r setoptions,echo = FALSE}

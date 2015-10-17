@@ -1,11 +1,8 @@
 ---
-title: "Reproducible Research - Project 1"
-author: "Michael Gregory"
-date: "October 17, 2015"
+title: "Reproducible Research: Peer Assessment 1"
 output:
   html_document:
     keep_md: yes
-    self_contained: no
 ---
 
 
@@ -75,7 +72,7 @@ print(xt, type="html")
 ```
 
 <!-- html table generated in R 3.2.0 by xtable 1.7-4 package -->
-<!-- Sat Oct 17 14:35:37 2015 -->
+<!-- Sat Oct 17 14:54:57 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> Steps </th>  </tr>
   <tr> <td align="right"> Mean </td> <td align="right"> 10766 </td> </tr>
@@ -154,7 +151,7 @@ print(imputedXT, type="html")
 ```
 
 <!-- html table generated in R 3.2.0 by xtable 1.7-4 package -->
-<!-- Sat Oct 17 14:35:38 2015 -->
+<!-- Sat Oct 17 14:54:58 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> Steps </th>  </tr>
   <tr> <td align="right"> Imputed Mean </td> <td align="right"> 10766 </td> </tr>
