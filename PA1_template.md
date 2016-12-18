@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output:
-  html_document:
-    keep_md: yes
----
+# Reproducible Research: Peer Assessment 1
 
 
 
@@ -43,7 +38,6 @@ activityDF$date <- as.Date(activityDF$date)
 ```
 
 
-
 ##What is mean total number of steps taken per day?
 1. Calculate the total number of steps taken per day (ignoring missing values)
 
@@ -58,7 +52,7 @@ sumStepsByDay <- aggregate(steps ~ date, FUN=sum, data=activityDF, na.action = "
 hist(sumStepsByDay$steps, main = "Histogram of Total Steps Taken per Day (ignoring missing values)", xlab = "steps")
 ```
 
-![plot of chunk stepshist](figure/stepshist-1.png) 
+![](PA1_template_files/figure-html/stepshist-1.png) 
 
 3. Calculate and report the mean and median total number of steps taken per day
 
@@ -72,7 +66,7 @@ print(xt, type="html")
 ```
 
 <!-- html table generated in R 3.2.0 by xtable 1.7-4 package -->
-<!-- Sat Oct 17 14:54:57 2015 -->
+<!-- Sun Dec 18 20:18:24 2016 -->
 <table border=1>
 <tr> <th>  </th> <th> Steps </th>  </tr>
   <tr> <td align="right"> Mean </td> <td align="right"> 10766 </td> </tr>
@@ -93,7 +87,7 @@ plot(meanStepsByInterval, type="l",
      xlab = "5-min Interval")
 ```
 
-![plot of chunk showplot](figure/showplot-1.png) 
+![](PA1_template_files/figure-html/showplot-1.png) 
 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -141,7 +135,7 @@ imputedSumStepsByDay <- aggregate(steps ~ date, FUN=sum, data=activityDF)
 hist(imputedSumStepsByDay$steps, main = "Histogram of Total Steps Taken per Day (with imputed missing values)", xlab = "steps")
 ```
 
-![plot of chunk showimputed](figure/showimputed-1.png) 
+![](PA1_template_files/figure-html/showimputed-1.png) 
 
 ```r
 imputedMeanSteps <- round(mean(imputedSumStepsByDay$steps))
@@ -151,7 +145,7 @@ print(imputedXT, type="html")
 ```
 
 <!-- html table generated in R 3.2.0 by xtable 1.7-4 package -->
-<!-- Sat Oct 17 14:54:58 2015 -->
+<!-- Sun Dec 18 20:18:24 2016 -->
 <table border=1>
 <tr> <th>  </th> <th> Steps </th>  </tr>
   <tr> <td align="right"> Imputed Mean </td> <td align="right"> 10766 </td> </tr>
@@ -192,5 +186,5 @@ xyplot(steps ~ interval | Type.of.Day, meanStepsByDayType,
        ylab = "Number of Steps (mean)")
 ```
 
-![plot of chunk plotbydaytype](figure/plotbydaytype-1.png) 
+![](PA1_template_files/figure-html/plotbydaytype-1.png) 
 
